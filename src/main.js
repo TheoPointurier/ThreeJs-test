@@ -11,10 +11,10 @@ document.body.appendChild(renderer.domElement);
 
 // Ajouter des contrôles d'orbite pour zoom et rotation
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true; // Effet de damping pour une rotation plus douce
+controls.enableDamping = true;
 controls.dampingFactor = 0.25;
-controls.minDistance = 2; // Distance minimale de zoom
-controls.maxDistance = 20; // Distance maximale de zoom
+controls.minDistance = 2;
+controls.maxDistance = 20;
 
 // Ajouter une lumière
 const ambientLight = new THREE.AmbientLight(0x404040, 2);
@@ -26,18 +26,24 @@ scene.add(directionalLight);
 
 // Ajouter une grille
 const gridHelper = new THREE.GridHelper(10, 10);
-gridHelper.position.y = 0; // Place la grille au niveau du sol
+gridHelper.position.y = 0;
 scene.add(gridHelper);
+
+// Variable pour stocker l'objet chargé
+let ballObject;
 
 // Charger le fichier OBJ
 const loader = new OBJLoader();
 loader.load(
-    './models/islamicBall.obj', // Remplacez par le chemin vers votre fichier
+    './models/islamicBall.obj',
     (object) => {
-        object.scale.set(5, 5, 5); // Ajustez l'échelle pour qu'il prenne environ 50% de la largeur de la grille
-        object.position.set(0, 0, 0); // Positionne le modèle directement sur la grille
+        object.scale.set(5, 5, 5);
+        object.position.set(0, 0, 0);
         object.rotation.x = Math.PI / 2; // Ajuste l'orientation si nécessaire
         scene.add(object);
+        
+        // Stocker l'objet pour permettre la rotation
+        ballObject = object;
     },
     (xhr) => {
         console.log((xhr.loaded / xhr.total * 100) + '% chargé');
@@ -54,7 +60,13 @@ camera.lookAt(0, 0, 0);
 // Animation de rendu
 function animate() {
     requestAnimationFrame(animate);
-    controls.update(); // Mise à jour des contrôles d'orbite
+
+    // Si l'objet est chargé, le faire tourner
+    if (ballObject) {
+        ballObject.rotation.y += 0.005; // Rotation autour de l'axe Y
+    }
+
+    controls.update();
     renderer.render(scene, camera);
 }
 animate();
